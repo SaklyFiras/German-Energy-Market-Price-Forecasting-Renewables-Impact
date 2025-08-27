@@ -1,0 +1,15 @@
+pandas
+numpy
+requests
+pyarrow
+fastparquet
+matplotlib
+scikit-learn
+xgboost
+holidays
+psycopg2-binary
+pyyaml
+shap
+streamlit
+fastapi
+uvicorn

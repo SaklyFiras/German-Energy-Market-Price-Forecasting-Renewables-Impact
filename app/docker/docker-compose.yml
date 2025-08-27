@@ -1,0 +1,81 @@
+name: energy-price-forecast-de
+
+services:
+  jupyter:
+    image: jupyter/minimal-notebook:python-3.11
+    container_name: epfd-jupyter
+    restart: unless-stopped
+    environment:
+      # Set this in your .env (JUPYTER_TOKEN). Falls back to "dev" if not set.
+      JUPYTER_TOKEN: ${JUPYTER_TOKEN:-dev}
+      JUPYTER_ENABLE_LAB: "yes"
+      PYTHONPATH: /home/jovyan/work
+    command: >
+      start-notebook.sh
+      --NotebookApp.token=${JUPYTER_TOKEN:-dev}
+      --NotebookApp.allow_origin='*'
+      --NotebookApp.disable_check_xsrf=True
+    ports:
+      - "8888:8888"
+    volumes:
+      - ../:/home/jovyan/work
+    depends_on:
+      - postgres
+    networks:
+      - epfd_net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: epfd-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-epfd}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-epfd}
+      POSTGRES_DB: ${POSTGRES_DB:-epfd}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../:/repo:ro
+    networks:
+      - epfd_net
+
+  adminer:
+    image: adminer:latest
+    container_name: epfd-adminer
+    restart: unless-stopped
+    environment:
+      # Optional theme; remove if you prefer default
+      ADMINER_DEFAULT_SERVER: postgres
+      
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - epfd_net
+
+  # Optional lightweight Python runner for CLI scripts (ingestion, features, etc.)
+  py:
+    image: python:3.11-slim
+    container_name: epfd-py
+    working_dir: /app
+    command: tail -f /dev/null
+    volumes:
+      - ../:/app
+    networks:
+      - epfd_net
+    environment:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONUNBUFFERED: "1"
+      ENTSOE_TOKEN: ${ENTSOE_TOKEN}
+    ports:
+      - "8501:8501" # Streamlit
+      - "8000:8000" # FastAPI
+
+networks:
+  epfd_net:
+    external: true
+
+volumes:
+  pgdata:

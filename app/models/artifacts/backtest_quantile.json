@@ -1,0 +1,7 @@
+{
+  "days_tested": 30,
+  "coverage": 0.8257042253521126,
+  "expected_coverage": 0.8,
+  "avg_interval_width": 73.07027435302734,
+  "mae_p50": 18.48676838172101
+}

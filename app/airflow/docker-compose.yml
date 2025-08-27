@@ -1,0 +1,63 @@
+version: "3.9"
+
+networks:
+  epfd_net:
+    external: true
+
+x-airflow-common: &airflow-common
+  build:
+    context: .. # repo root
+    dockerfile: airflow/Dockerfile
+  # If you still have permissions issues, uncomment the next line:
+  user: "0:0"
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://epfd:epfd@epfd-postgres/epfd
+    # pass any secrets your scripts need:
+    ENTSOE_TOKEN: ${ENTSOE_TOKEN:-}
+    AIRFLOW_CONN_EPFD_POSTGRES: postgresql://epfd:epfd@epfd-postgres:5432/epfd
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - airflow_logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - ../:/app
+  networks:
+    - epfd_net
+
+services:
+  airflow-init:
+    user: "0:0"
+    <<: *airflow-common
+    container_name: airflow-init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db init && \
+        airflow users create \
+          --username admin \
+          --password admin \
+          --firstname Air \
+          --lastname Flow \
+          --role Admin \
+          --email admin@example.com
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow-webserver
+    restart: always
+    user: "0:0"
+    ports:
+      - "8081:8080"
+    command: webserver
+
+  airflow-scheduler:
+    <<: *airflow-common
+    user: "0:0"
+    container_name: airflow-scheduler
+    restart: always
+    command: scheduler
+
+volumes:
+  airflow_logs: {}

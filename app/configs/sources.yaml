@@ -1,0 +1,8 @@
+entsoe:
+  bidding_zone_code: "10Y1001A1001A82H"  # DE-LU
+  base_url: "https://transparency.entsoe.eu/api"
+  document_type_day_ahead: "A44"         # DA price
+smard:
+  note: "Use SMARD JSON endpoints for load and generation by source (wind, solar)."
+opsd:
+  base_url: "https://data.open-power-system-data.org/time_series/latest/"

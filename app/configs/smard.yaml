@@ -1,0 +1,9 @@
+region: "DE"
+# resolution can be "hour" or "quarterhour"
+resolution: "hour"
+
+series:
+  load_actual:   410
+  wind_onshore:  4067
+  wind_offshore: 1225
+  solar_pv:      4068

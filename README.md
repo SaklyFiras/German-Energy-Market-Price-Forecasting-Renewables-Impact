@@ -1,145 +1,153 @@
-⚡ German Energy Market Price Forecasting & Renewables Impact
+# ⚡ German Energy Market Price Forecasting
 
-Forecasting day-ahead electricity prices in Germany 🇩🇪, with a focus on the impact of renewable generation (wind & solar) and demand dynamics.
-This project combines data pipelines, machine learning, and automation into a production-style workflow.
+[![Python](https://img.shields.io/badge/python-3.11-blue.svg)]()
+[![Docker](https://img.shields.io/badge/docker-ready-blue)]()
+[![Airflow](https://img.shields.io/badge/airflow-2.9-orange)]()
+[![Streamlit](https://img.shields.io/badge/streamlit-dashboard-red)]()
 
-📖 Overview
+Forecasting **day-ahead electricity prices** in Germany with the impact of renewables (wind & solar).  
+The project combines **data ingestion (OPSD, ENTSO-E, SMARD)**, **feature engineering**, **machine learning (XGBoost, quantile regression)**,  
+and **automation with Airflow**, exposing both a **FastAPI service** and a **Streamlit dashboard**.
 
-Predicts hourly electricity prices using demand, wind, solar, and calendar features.
+---
 
-Supports probabilistic forecasts (quantile regression with XGBoost) to capture uncertainty.
+## 📌 Features
 
-Provides interpretability with feature importance and SHAP values.
+- 🔄 **Data ingestion** from OPSD, ENTSO-E, and SMARD APIs  
+- 🛠️ **Feature engineering** with lagged values, rolling means, and calendar effects  
+- 📈 **Baseline & Quantile models** (XGBoost) for point + probabilistic forecasts  
+- 🔍 **Model explainability** via SHAP feature importances  
+- 📊 **Visualization**: prediction plots, fan charts, calibration curves  
+- ⚙️ **Automation**: Airflow DAGs for daily data fetch, feature building, training, validation  
+- 🚀 **APIs & Dashboard**: FastAPI for predictions + Streamlit dashboard for exploration  
 
-Automates pipelines with Apache Airflow.
+---
 
-Interactive Streamlit dashboard and FastAPI API for serving forecasts.
+## 🏗️ Architecture
 
-⚡ Features
+```mermaid
+flowchart TD
+    subgraph Ingestion
+        OPSD --> Raw[Postgres Raw Data]
+        ENTSOE --> Raw
+        SMARD --> Raw
+    end
 
-✅ Data ingestion from OPSD, ENTSO-E, SMARD
-✅ Feature engineering (lags, rolling means, calendar effects, holidays)
-✅ Baseline model: XGBoost with MAE ≈ 3.2 €/MWh
-✅ Probabilistic forecasts (10%, 50%, 90%)
-✅ SHAP-based interpretability per prediction
-✅ Airflow DAGs for daily automation
-✅ Streamlit dashboard + REST API
+    subgraph Features
+        Raw --> FE[Feature Engineering]
+        FE --> PG[Postgres Features]
+    end
 
-🛠️ Tech Stack
+    subgraph Modeling
+        PG --> Train[Train Models]
+        Train --> Metrics[Metrics + Artifacts]
+        PG --> Predict[Predict Next 24h]
+    end
 
-Python: pandas, scikit-learn, xgboost, shap, psycopg2
+    subgraph Serving
+        Predict --> API[FastAPI]
+        Predict --> Streamlit
+    end
 
-Databases: PostgreSQL
+    subgraph Automation
+        Airflow --> Ingestion
+        Airflow --> Features
+        Airflow --> Modeling
+    end
+```
 
-Deployment: Docker + Docker Compose
+---
 
-Visualization: Streamlit, matplotlib
+## 🚀 Quickstart
 
-Automation: Apache Airflow
+```bash
+# 1. Clone repo
+git clone https://github.com/<your-username>/german-energy-forecasting.git
+cd german-energy-forecasting/app
 
-API: FastAPI
+# 2. Copy env file and add secrets
+cp .env.example .env
+# Edit .env to add ENTSOE_TOKEN and DB settings
 
-🚀 Getting Started
-1. Clone Repository
-git clone https://github.com/YOURNAME/German-Energy-Forecasting.git
-cd German-Energy-Forecasting/app
+# 3. Start services
+docker compose up -d
 
-2. Configure Environment
+# 4. Run migrations
+make migrate
 
-Copy .env.example → .env and add your credentials:
+# 5. Build features
+make build-features
 
-ENTSOE_TOKEN=your_entsoe_api_key
+# 6. Train baseline model
+make train-baseline
+
+# 7. Predict next 24h
+make forecast
+```
+
+---
+
+## 📊 Example Results
+
+| Metric | Value |
+|--------|-------|
+| MAE    | ~3.17 €/MWh |
+| RMSE   | ~5.11 €/MWh |
+
+<p align="center">
+  <img src="models/artifacts/predictions_next24h.png" width="600">
+</p>
+
+---
+
+## 📅 Automation with Airflow
+
+Airflow orchestrates the pipeline:
+
+- **Fetch data** from OPSD, ENTSO-E, SMARD  
+- **Build features** and load into Postgres  
+- **Train models** and validate metrics  
+- **Run data quality checks**  
+
+Access UI: [http://localhost:8080](http://localhost:8080)  
+
+---
+
+## 📦 Tech Stack
+
+- **Python** (pandas, scikit-learn, xgboost, shap)  
+- **Docker** (multi-service setup)  
+- **Postgres** for feature store  
+- **Airflow** for orchestration  
+- **FastAPI** (REST API for predictions)  
+- **Streamlit** (interactive dashboard)  
+
+---
+
+## 🔑 Environment Variables
+
+Create a `.env` file with:
+
+```ini
 POSTGRES_USER=epfd
 POSTGRES_PASSWORD=epfd
 POSTGRES_DB=epfd
+POSTGRES_HOST=postgres
 
-3. Start Services
-docker compose -f docker/docker-compose.yml up -d --build
+ENTSOE_TOKEN=your_api_key_here
+```
 
-4. Run Pipelines
-# Apply database migrations
-make migrate
+---
 
-# Fetch sample OPSD data
-make fetch-opsd
+## 📌 To Do / Future Work
 
-# Build & load features
-make build-features
-make load-features
+- [ ] CRPS scoring for probabilistic forecasts  
+- [ ] CI/CD pipeline (GitHub Actions)  
+- [ ] Model registry integration (MLflow or similar)  
+- [ ] Deploy dashboard online  
 
-# Train baseline model
-make train-baseline
-make show-metrics
+---
 
-5. Interactive Apps
+## 📜 License
 
-Streamlit dashboard → http://localhost:8501
-
-FastAPI endpoint → http://localhost:8000/docs
-
-Airflow UI → http://localhost:8080
-
-📊 Outputs
-Forecasts
-
-Next 24h predictions → predictions_next24h.csv + plot
-
-SHAP Analysis
-
-Feature importance
-
-Local explanations per timestamp
-
-Quantile Fan Forecasts
-
-10% – 50% – 90% intervals
-
-📅 Automation with Airflow
-
-Airflow DAG: energy_forecast_dag.py
-
-Tasks:
-
-Fetch new data (OPSD / ENTSO-E / SMARD)
-
-Build & load features into Postgres
-
-Train & evaluate models
-
-Forecast next 24h
-
-Run data quality checks (row counts, duplicates)
-
-Run:
-
-cd app/airflow
-docker compose up -d
-
-
-Airflow UI → http://localhost:8080
-
-📈 Results
-
-Baseline XGBoost: MAE ≈ 3.2 €/MWh, RMSE ≈ 5.1 €/MWh
-
-Renewable share strongly impacts price volatility.
-
-SHAP values show:
-
-High load → price ↑
-
-High renewables share → price ↓
-
-🔑 Why This Matters
-
-Energy prices are highly volatile in renewable-heavy grids.
-
-Probabilistic forecasts provide uncertainty bounds (crucial for trading, grid balancing, and risk management).
-
-This project demonstrates how to productionize ML for energy systems — from raw data → features → models → API → automated pipelines.
-
-📄 License
-
-MIT License © 2025 Firas
-
-✨ If you like this project, ⭐ star the repo and share it!
+MIT License © 2025 Firas Sakli

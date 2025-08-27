@@ -94,9 +94,18 @@ make forecast
 | MAE    | ~3.17 €/MWh |
 | RMSE   | ~5.11 €/MWh |
 
-<p align="center">
-  <img src="models/artifacts/predictions_next24h.png" width="600">
-</p>
+## 📊 Results & Visuals
+
+Here are some example outputs from the project:
+
+| 24h Forecast | Probabilistic Fan Chart |
+|--------------|--------------------------|
+| ![Next24h](app/models/artifacts/predictions_next24h.png) | ![FanChart](app/models/artifacts/predictions_fan.png) |
+
+| Feature Importance | SHAP Beeswarm |
+|--------------------|----------------|
+| ![Importance](app/models/artifacts/feature_importance.png) | ![SHAP](app/models/artifacts/shap_beeswarm.png) |
+
 
 ---
 
@@ -151,3 +160,4 @@ ENTSOE_TOKEN=your_api_key_here
 ## 📜 License
 
 MIT License © 2025 Firas Sakli
+

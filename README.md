@@ -107,6 +107,16 @@ Here are some example outputs from the project:
 | ![Importance](app/models/artifacts/feature_importance.png) | ![SHAP](app/models/artifacts/shap_beeswarm.png) |
 
 
+### Airflow DAG (ETL & Forecasting Pipeline)
+![Airflow DAG](images/airflow_dag.png)
+
+### FastAPI Endpoint (Serving Forecasts)
+![FastAPI Endpoint](images/fastapi_endpoint.png)
+
+### Streamlit Dashboard (Visualization & Explainability)
+![Streamlit Dashboard](images/streamlit_dashboard.png)
+
+
 ---
 
 ## 📅 Automation with Airflow
@@ -160,4 +170,5 @@ ENTSOE_TOKEN=your_api_key_here
 ## 📜 License
 
 MIT License © 2025 Firas Sakli
+
 

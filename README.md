@@ -108,13 +108,13 @@ Here are some example outputs from the project:
 
 
 ### Airflow DAG (ETL & Forecasting Pipeline)
-![Airflow DAG](images/Airflow_DAG_Success_Run.jpeg)
+![Airflow DAG](images/Airflow_DAG_Success_Run.png)
 
 ### FastAPI Endpoint (Serving Forecasts)
 ![FastAPI Endpoint](images/FastAPI_Endpoint.jpeg)
 
 ### Streamlit Dashboard (Visualization & Explainability)
-![Streamlit Dashboard](images/Streamlit_Dashboard.jpeg)
+![Streamlit Dashboard](images/Streamlit_Dashboard.png)
 
 
 ---
@@ -170,6 +170,7 @@ ENTSOE_TOKEN=your_api_key_here
 ## 📜 License
 
 MIT License © 2025 Firas Sakli
+
 
 
 
